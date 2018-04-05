@@ -5,12 +5,9 @@ namespace COMP060A2code
 {
     public partial class Form1 : Form
     {
-        int wrongTracker, guessedPos, wins = 0, losses = 0;
+        int wrongTracker, guessedPos, wins, losses;
         int wordChoice;
-        bool letterFound, alreadyGuessed;
-        string guessedWord;
-        char[] guessAsArray;
-        char[] usedLetters;
+        char[] guessAsArray, usedLetters;
         Random random;
         Game newGame;
 
@@ -18,62 +15,65 @@ namespace COMP060A2code
         {
             InitializeComponent();
             random = new Random();
+            wins = 0;
+            losses = 0;
         }
 
         private void guessButton_Click(object sender, EventArgs e)
         {
             if (guessBox.Text.Length == 0)
                 MessageBox.Show("You need to enter a guess!");
+
             else
             {
                 guessAsArray = guessBox.Text.ToLower().ToCharArray();
                 foreach (char letter in guessAsArray)
                 {
-                    alreadyGuessed = CheckForRepeat(letter);
-
-                    if (alreadyGuessed && newGame.gameOver == false)
+                    if (!newGame.gameActive)
+                        break;
+                    if (!char.IsLetter(letter))
+                        MessageBox.Show(letter + " is not a valid guess");
+                    else if (guessedLetters.Text.Contains(letter.ToString()))
                         MessageBox.Show("You Already Guessed the letter: " + letter.ToString());
                     else
                     {
-                        if (newGame.gameOver == false)
+                        usedLetters[guessedPos] = letter;
+                        guessedLetters.Text = String.Join(" ", usedLetters);
+                        guessedPos++;
+                        if (newGame.fullWord.Contains(letter.ToString()))
                         {
-                            usedLetters[guessedPos] = letter;
-                            guessedLetters.Text = String.Join(" ", usedLetters);
-                            guessedPos++;
-                        }
-
-                        letterFound = newGame.GuessLetter(letter);
-
-                        if (letterFound)
-                        {
-                            guessedWord = new string(newGame.toShow);
-                            wordBox.Text = guessedWord;
-                            CheckWin();
+                            for (int index = 0; index < newGame.fullWord.Length; index++)
+                            {
+                                if (letter == newGame.hiddenWord[index])
+                                    newGame.toShow[index] = newGame.hiddenWord[index];
+                            }
+                            newGame.guessedWord = new string(newGame.toShow);
+                            wordBox.Text = newGame.guessedWord;
+                            if (!newGame.guessedWord.Contains("*"))
+                                EndGame(true);
                         }
                         else
                         {
                             wrongTracker++;
                             CheckWrongs(wrongTracker);
+                            if(wrongTracker == 6)
+                               EndGame(false);
                         }
                     }
-
                 }
-                guessBox.Text = "";
-
-                
+                guessBox.Text = "";             
             }
         }
 
         private void resetButton_Click(object sender, EventArgs e)
         {
-            usedLetters  = new char[26];
+            usedLetters = new char[26];
             wordChoice = random.Next(9);
             wrongTracker = 0;
             guessedPos = 0;
             newGame = new Game(wordChoice);
-            CheckWrongs(wrongTracker);
-            guessedWord = new string(newGame.toShow);
-            wordBox.Text = guessedWord;
+            hangmanPic.Image = Properties.Resources.Hangman0;
+            wordBox.Text = newGame.guessedWord;
             guessedLetters.Text = "";
             guessButton.Enabled = true;
         }
@@ -101,41 +101,13 @@ namespace COMP060A2code
                     break;
                 case 6:
                     hangmanPic.Image = Properties.Resources.Hangman6;
-                    EndGame(false);
                     break;
             }
         }
-        public bool CheckForRepeat(char currentGuess)
-        {
-            bool usedBefore = false;
-            foreach (char checker in usedLetters)
-            {
-                if (currentGuess == checker)
-                {
-                    usedBefore = true;
-                    break;
-                }
-            }
-            return usedBefore;
-        }
-        public void CheckWin()
-        {
-            bool didWin = true;
-            foreach (char letter in guessedWord)
-            {
-                if (letter == '*')
-                {
-                    didWin = false;
-                    break;
-                }
 
-            }
-            if (didWin)
-                EndGame(true);
-        }
         public void EndGame(bool wonLost)
         {
-            newGame.gameOver = true;
+            newGame.gameActive = false;
             if (wonLost)
             {
                 MessageBox.Show("You've won the game. Aren't you clever.");
