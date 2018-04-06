@@ -119,6 +119,7 @@
             // guessBox
             // 
             this.guessBox.Location = new System.Drawing.Point(307, 142);
+            this.guessBox.MaxLength = 15;
             this.guessBox.Name = "guessBox";
             this.guessBox.Size = new System.Drawing.Size(100, 20);
             this.guessBox.TabIndex = 8;

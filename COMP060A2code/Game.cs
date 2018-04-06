@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace COMP060A2code
 {
+    /// <summary>
+    /// creates an instance of the game when called. Contains the full word to be guessed, and the word with the letters
+    /// the player has revealed so far.
+    /// </summary>
     public class Game
     {
         public string fullWord, guessedWord;

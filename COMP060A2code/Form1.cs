@@ -18,7 +18,14 @@ namespace COMP060A2code
             wins = 0;
             losses = 0;
         }
-
+        /// <summary>
+        /// takes the user guess and checks it for validity, whether its been used, and then if it is in the target
+        /// word, shows the position of said letter(s) where * had been before, and adds it to the guessed words list
+        /// if not in, calls CheckWrongs. checks if game is over (word is guessed or six wrong guesses)
+        /// --allows player to enter more than one guess at a time, but tries each character individually--
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void guessButton_Click(object sender, EventArgs e)
         {
             if (guessBox.Text.Length == 0)
@@ -29,7 +36,7 @@ namespace COMP060A2code
                 guessAsArray = guessBox.Text.ToLower().ToCharArray();
                 foreach (char letter in guessAsArray)
                 {
-                    if (!newGame.gameActive)
+                    if (!newGame.gameActive) //will break the loop if the game is over to prevent problems/ irrelevant pop-ups
                         break;
                     if (!char.IsLetter(letter))
                         MessageBox.Show(letter + " is not a valid guess");
@@ -64,7 +71,11 @@ namespace COMP060A2code
                 guessBox.Text = "";             
             }
         }
-
+        /// <summary>
+        /// initializes a new instance of Game and resets all boxes and values that need to be
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void resetButton_Click(object sender, EventArgs e)
         {
             usedLetters = new char[26];
@@ -76,7 +87,12 @@ namespace COMP060A2code
             wordBox.Text = newGame.guessedWord;
             guessedLetters.Text = "";
             guessButton.Enabled = true;
+            guessBox.MaxLength = newGame.fullWord.Length; // allows player to guess multiple characters at a time, up to the length of the word
         }
+        /// <summary>
+        /// changes image depending on how many wrong responses the user has given
+        /// </summary>
+        /// <param name="wrongGuesses"></param>
         public void CheckWrongs(int wrongGuesses)
         {
             switch (wrongGuesses)
@@ -104,7 +120,11 @@ namespace COMP060A2code
                     break;
             }
         }
-
+        /// <summary>
+        /// when called, increments wins xor losses depending on which parameter is sent
+        /// gives the message of whether the user won or lost, disables the guess button.
+        /// </summary>
+        /// <param name="wonLost"></param>
         public void EndGame(bool wonLost)
         {
             newGame.gameActive = false;
